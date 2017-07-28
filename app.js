@@ -19,13 +19,7 @@ server.post('/api/messages', connector.listen());
 
 // Receive messages from the user and respond by echoing each message back (prefixed with 'You said:')
 var bot = new builder.UniversalBot(connector, function (session) {
-    // やりたいこと
-    // botと鉄道駅に限定した駅しりとりを行う
-    // * ユーザのメッセージをnameに代入し駅API呼び出し
-    //   * 駅が存在した場合
-    //     * みつけました！〇〇です
-    //   * 駅が存在しなかった場合
-    //     * そんなえきないですよ
+
     baseUrl = "http://api.ekispert.jp/v1/json/"
     method = "station"
     url = encodeURI(baseUrl + method + "?name=" + session.message.text + "&key=" + process.env.EKISPERT_ACCESS_KEY)
@@ -36,6 +30,40 @@ var bot = new builder.UniversalBot(connector, function (session) {
 
     request.get(options, function(error, response, body) {
       if (!error && response.statusCode == 200) {
+
+        if (body.ResultSet.Point) {
+          point = {}
+          if (body.ResultSet.Point instanceof Array) {
+            point = body.ResultSet.Point[0]
+          } else {
+            point = body.ResultSet.Point
+          }
+
+          url = encodeURI(baseUrl + method + "?name=" + point.Station.Yomi.slice(-1) + "&key=" + process.env.EKISPERT_ACCESS_KEY)
+          options = {
+            url: url,
+            json: true
+          }
+          request.get(options, function(error, response, body) {
+            if (!error && response.statusCode == 200) {
+              if (body.ResultSet.Point) {
+                point = {}
+                if (body.ResultSet.Point instanceof Array) {
+                  point = body.ResultSet.Point[0]
+                } else {
+                  point = body.ResultSet.Point
+                }
+                session.send("みつけました！ %s です", point.Station.Yomi)
+              } else {
+                session.send('まいりました')
+              }
+            } else {
+              console.log('error: '+ response.statusCode)
+            }
+          })
+        } else {
+          session.send("そんなえきないですよ")
+        }
         console.log(body.ResultSet.Point)
         session.send("みつけました！ %s です", body.ResultSet.Point.Station.Name)
       } else {
