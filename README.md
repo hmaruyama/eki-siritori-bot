@@ -11,10 +11,11 @@
 
 Botを起動します。
 
-```
+```sh
 $ git clone https://github.com/hmaruyama/eki-siritori-bot.git
 $ cd eki-siritori-bot
 $ npm install
+$ export EKISPERT_ACCESS_KEY=xxxxxxxxxxxxxxxx     # 駅すぱあとWebサービスのアクセスキー
 $ node app.js
 ```
 
