@@ -39,6 +39,11 @@ var bot = new builder.UniversalBot(connector, function (session) {
             point = body.ResultSet.Point
           }
 
+          if (point.Station.Yomi.slice(-1) == 'ん') {
+            session.send('さいごに"ん"がついてるよ！')
+            return
+          }
+
           url = encodeURI(baseUrl + method + "?name=" + point.Station.Yomi.slice(-1) + "&key=" + process.env.EKISPERT_ACCESS_KEY)
           options = {
             url: url,
