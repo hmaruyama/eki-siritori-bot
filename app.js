@@ -64,8 +64,6 @@ var bot = new builder.UniversalBot(connector, function (session) {
         } else {
           session.send("そんなえきないですよ")
         }
-        console.log(body.ResultSet.Point)
-        session.send("みつけました！ %s です", body.ResultSet.Point.Station.Name)
       } else {
         console.log('error: '+ response.statusCode)
       }
