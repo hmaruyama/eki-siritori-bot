@@ -31,44 +31,48 @@ var bot = new builder.UniversalBot(connector, function (session) {
     request.get(options, function(error, response, body) {
       if (!error && response.statusCode == 200) {
 
-        if (body.ResultSet.Point) {
-          point = {}
-          if (body.ResultSet.Point instanceof Array) {
-            point = body.ResultSet.Point[0]
-          } else {
-            point = body.ResultSet.Point
-          }
-
-          if (point.Station.Yomi.slice(-1) == 'ん') {
-            session.send('さいごに"ん"がついてるよ！')
-            return
-          }
-
-          url = encodeURI(baseUrl + method + "?name=" + point.Station.Yomi.slice(-1) + "&key=" + process.env.EKISPERT_ACCESS_KEY)
-          options = {
-            url: url,
-            json: true
-          }
-          request.get(options, function(error, response, body) {
-            if (!error && response.statusCode == 200) {
-              if (body.ResultSet.Point) {
-                point = {}
-                if (body.ResultSet.Point instanceof Array) {
-                  point = body.ResultSet.Point[0]
-                } else {
-                  point = body.ResultSet.Point
-                }
-                session.send("みつけました！ %s です", point.Station.Yomi)
-              } else {
-                session.send('まいりました')
-              }
-            } else {
-              console.log('error: '+ response.statusCode)
-            }
-          })
-        } else {
+        if (!body.ResultSet.Point) {
           session.send("そんなえきないですよ")
+          return
         }
+
+        point = {}
+        if (body.ResultSet.Point instanceof Array) {
+          point = body.ResultSet.Point[0]
+        } else {
+          point = body.ResultSet.Point
+        }
+
+        if (point.Station.Yomi.slice(-1) == 'ん') {
+          session.send('さいごに"ん"がついてるよ！')
+          return
+        }
+
+        url = encodeURI(baseUrl + method + "?name=" + point.Station.Yomi.slice(-1) + "&key=" + process.env.EKISPERT_ACCESS_KEY)
+        options = {
+          url: url,
+          json: true
+        }
+        request.get(options, function(error, response, body) {
+          if (!error && response.statusCode == 200) {
+
+            if (!body.ResultSet.Point) {
+              session.send('まいりました')
+              return
+            }
+
+            point = {}
+            if (body.ResultSet.Point instanceof Array) {
+              point = body.ResultSet.Point[0]
+            } else {
+              point = body.ResultSet.Point
+            }
+            session.send("みつけました！ %s です", point.Station.Yomi)
+          } else {
+            console.log('error: '+ response.statusCode)
+          }
+        })
+
       } else {
         console.log('error: '+ response.statusCode)
       }
